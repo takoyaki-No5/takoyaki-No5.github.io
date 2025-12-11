@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>YouTube API</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Playlists</h1>
+  <label for="sort">並び替え</label>
+  <select name="sort" id="sort">
+    <option value="positionAsc">追加順(新しい順)</option>
+    <option value="positionDesc">追加順(古い順)</option>
+    <option value="viewCountAsc">再生回数(少ない順)</option>
+    <option value="viewCountDesc">再生回数(多い順)</option>
+  </select>
+  
+  <h2>検索</h2>
+  <form id="searchForm">
+    <fieldset>
+      <legend>再生回数</legend>
+      <label><input type="number" name="minViews" min="0" value="0"/></label>〜
+      <label><input type="number" name="maxViews" min="0" value="100000"/>万回</label>
+    </fieldset>
+
+    <p>
+      <button type="submit">検索</button>
+    </p>
+  </form>
+  
+  <h2>n分のプレイリスト作成</h2>
+  <form id="playlistForm">
+    <label for="playlistTime">プレイリストの長さ</label>
+    <input type="number" id="playlistTime" name="playlistTime" min="1" required/>分
+    <button type="submit">作成する</button>
+    <div id="playlistTotalTime"></div>
+  </form>
+  <button id="reset" type="button">クリア</button>
+  
+  <div id="player"></div>
+  <ul id="videoList"></ul>
+  
+  <script type="module" src="func.js"></script>
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script type="module" src="load.js"></script>
+  <script type="module" src="sort.js"></script>
+  <script type="module" src="event.js"></script>
+</body>
+</html>
+

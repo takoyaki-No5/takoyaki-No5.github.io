@@ -1,0 +1,38 @@
+#videoList li{
+    display: flex;
+    padding: 1px 0;
+    align-items: center;
+}
+
+#videoList li>span{
+    padding-right: 10px;
+    width: 30px;
+    text-align: right;
+}
+#videoList li div{
+    display: flex;
+    flex-direction: column;
+    padding-left: 10px;
+}
+
+#videoList li div span{
+    margin:3px;
+}
+
+#videoList li.current{
+    background-color: antiquewhite;
+}
+#videoList img{
+    object-fit: cover;
+    object-position: center;
+    height: 66px;
+    width: 119px;
+}
+
+#playlistForm{
+    height: 80px;
+}
+
+body{
+    max-width: 1200px;
+}
