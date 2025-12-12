@@ -48,8 +48,7 @@ const load=async()=> {
         const data = await res.json();
         all_items.push(...data.items);
         next_page_token = data.nextPageToken;
-    //}while(next_page_token);
-    }while(false);
+    }while(next_page_token);
     
     let all_video_ids=all_items.map(item=>item.snippet.resourceId.videoId)
     
