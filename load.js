@@ -40,7 +40,7 @@ export const create_list=()=>{
 
 const load=async()=> {
     let next_page_token ="";
-    const max_results=10;
+    const max_results=50;
     do{
         const url=`https://www.googleapis.com/youtube/v3/playlistItems?` + `part=snippet&playlistId=${PLAYLIST_ID}&maxResults=${max_results}&key=${API_KEY}`+
             (next_page_token ? `&pageToken=${next_page_token}`:"");
