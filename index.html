@@ -7,6 +7,7 @@
 </head>
 <body>
   <h1>Playlists</h1>
+
   <label for="sort">並び替え</label>
   <select name="sort" id="sort">
     <option value="positionAsc">追加順(新しい順)</option>
@@ -14,7 +15,7 @@
     <option value="viewCountAsc">再生回数(少ない順)</option>
     <option value="viewCountDesc">再生回数(多い順)</option>
   </select>
-  
+  <button id="shuffle">シャッフル</button>
   <h2>検索</h2>
   <form id="searchForm">
     <fieldset>
@@ -37,7 +38,11 @@
   </form>
   <button id="reset" type="button">クリア</button>
   
-  <div id="player"></div>
+  <div id="player" style="width: 640px; height: 360px;">
+    <div id="loader" hidden>
+      <div id="load-circle"></div>
+    </div>
+  </div>
   <ul id="videoList"></ul>
   
   <script type="module" src="func.js"></script>

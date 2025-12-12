@@ -34,3 +34,12 @@ export const sec_to_our_min = (sec) => {
 
   return text;
 };
+
+export const shuffleArray=(array)=> {
+  const copy = array.slice(); // 元の配列はコピーして保持
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]]; // 要素を入れ替え
+  }
+  return copy;
+}

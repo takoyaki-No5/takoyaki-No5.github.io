@@ -1,4 +1,4 @@
-import { sec_to_our_min } from "./func.js";
+import { sec_to_our_min, shuffleArray } from "./func.js";
 import { create_list, all_items,display_items } from "./load.js";
 import { compare_position_at,compare_view_count,sort,dp } from "./algorithm.js";
 
@@ -67,5 +67,11 @@ document.getElementById("playlistForm").addEventListener("submit",handle_create_
 
 document.getElementById("reset").addEventListener("click",()=>{
     display_items.splice(0,display_items.length,...all_items);
+    create_list();
+});
+
+document.getElementById("shuffle").addEventListener("click",()=>{
+    const shuffle_arr=shuffleArray(all_items);
+    display_items.splice(0,display_items.length,...shuffle_arr);
     create_list();
 });

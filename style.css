@@ -36,3 +36,24 @@
 body{
     max-width: 1200px;
 }
+
+#player{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#load-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 8px solid rgba(0, 255, 255, 0.2); 
+    border-top-color: rgba(0, 255, 255, 1);
+    animation: rotate 1s linear infinite;
+}
+
+@keyframes rotate {
+    to {
+        transform: rotate(360deg);
+    }
+}

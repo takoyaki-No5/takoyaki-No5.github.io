@@ -3,7 +3,7 @@ export const all_items=[];
 export let display_items=[];
 
 //const CHANNEL_ID = "UCFz1nNoqzgfM-OhmhuI1fYg";
-const API_KEY = "AIzaSyBrGIXwDKknJ5zyZvNc4T3bAqdpUfqNH1M";            
+const API_KEY = "AIzaSyC32k1f-L-HgWX7vZjHnPGTP-TnKa4eZtY";            
 const PLAYLIST_ID = "PLg_Vllr2X7mKpLGkxsHPQe7NwIyLZ6fF5"
 let player;
 let idx=0;
@@ -40,7 +40,7 @@ export const create_list=()=>{
 
 const load=async()=> {
     let next_page_token ="";
-    const max_results=50
+    const max_results=10;
     do{
         const url=`https://www.googleapis.com/youtube/v3/playlistItems?` + `part=snippet&playlistId=${PLAYLIST_ID}&maxResults=${max_results}&key=${API_KEY}`+
             (next_page_token ? `&pageToken=${next_page_token}`:"");
@@ -48,11 +48,12 @@ const load=async()=> {
         const data = await res.json();
         all_items.push(...data.items);
         next_page_token = data.nextPageToken;
-    }while(next_page_token);
+    //}while(next_page_token);
+    }while(false);
     
     let all_video_ids=all_items.map(item=>item.snippet.resourceId.videoId)
     
-    const chunk_size=50
+    const chunk_size=50;
     let video_datas=[]
     for(let i=0;i<all_video_ids.length;i+=chunk_size){
         const chunk=all_video_ids.slice(i,i+chunk_size).join(",");
@@ -147,10 +148,13 @@ const waitForYouTubeAPI = () => {
     });
 }
 
+const loader=document.getElementById("loader");
 const initApp = async () => {
+    loader.hidden=false;
     await load();                
     await waitForYouTubeAPI();   
     initPlayer();                
+    loader.hidden=true;
 }
 
 initApp();
