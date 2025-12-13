@@ -3,48 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <title>YouTube API</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modern-css-reset/dist/reset.min.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <h1>Playlists</h1>
+<body class="text-center d-flex flex-column align-items-center m-auto gap-3">
+  <h1 class="mt-3">YouTube プレイリスト再生</h1>
+  
+  <h2 class="fs-4">絞り込み</h2>
+  <form id="searchForm" class="d-flex align-items-center">
+    <div class="form-floating">
+      <input id="minViews" class="form-control" type="number" name="minViews" min="0" placeholder="0"/>
+      <label for="minViews">再生回数</label>
+    </div>
+    <span class="fs-4 mx-1">~</span>
+    <div class="form-floating">
+      <input id="maxViews" class="form-control" type="number" name="maxViews" min="0" placeholder="0"/>
+    </div>
+    <span class="fs-5 ms-1 me-2">万回</span>
 
-  <label for="sort">並び替え</label>
-  <select name="sort" id="sort">
-    <option value="positionAsc">追加順(新しい順)</option>
-    <option value="positionDesc">追加順(古い順)</option>
-    <option value="viewCountAsc">再生回数(少ない順)</option>
-    <option value="viewCountDesc">再生回数(多い順)</option>
-  </select>
-  <button id="shuffle">シャッフル</button>
-  <h2>検索</h2>
-  <form id="searchForm">
-    <fieldset>
-      <legend>再生回数</legend>
-      <label><input type="number" name="minViews" min="0" value="0"/></label>〜
-      <label><input type="number" name="maxViews" min="0" value="100000"/>万回</label>
-    </fieldset>
-
-    <p>
-      <button type="submit">検索</button>
-    </p>
+    <button class="btn btn-outline-primary fw-bold" type="submit">絞り込み</button>
   </form>
   
-  <h2>n分のプレイリスト作成</h2>
+  <h2 class="fs-4">n分のプレイリスト作成</h2>
   <form id="playlistForm">
-    <label for="playlistTime">プレイリストの長さ</label>
-    <input type="number" id="playlistTime" name="playlistTime" min="1" required/>分
-    <button type="submit">作成する</button>
+    <div class="d-flex align-items-center">
+      <div class="form-floating">
+        <input id="playlistTime" class="form-control" type="number" name="playlistTime" min="0" placeholder="0"/>
+        <label for="playlistTime">プレイリストの長さ</label>
+      </div>
+      <span class="fs-5 ms-1 me-2">分</span>
+      <button class="btn btn-outline-primary fw-bold" type="submit">作成する</button>
+    </div>
     <div id="playlistTotalTime"></div>
   </form>
-  <button id="reset" type="button">クリア</button>
   
-  <div id="player" style="width: 640px; height: 360px;">
+  <div class="d-flex gap-3">
+    <select class="form-select w-auto border-dark fw-bold" name="sort" id="sort" >
+      <option value="default">並び替え(デフォルト)</option>
+      <option value="viewCountAsc">再生回数(少ない順)</option>
+      <option value="viewCountDesc">再生回数(多い順)</option>
+    </select>
+    <button class="btn btn-outline-primary fw-bold" id="shuffle">シャッフル</button>
+    <button class="btn btn-outline-dark fw-bold" id="reset" type="button">全てクリア</button>
+  </div>
+  
+  <div id="player">
     <div id="loader" hidden>
       <div id="load-circle"></div>
     </div>
   </div>
-  <ul id="videoList"></ul>
+  <div id="video-info"></div>
+
   
+  <div class="border rounded mx-3 " style="max-height: 600px; overflow-y: auto;">
+    <div class="sticky-top bg-white p-1 border-bottom">
+      <h3 id="playlistTitle" class="fs-1"></h3>
+    </div>
+    <ul id="videoList" class="list-unstyled d-flex flex-column gap-1 py-2"></ul>
+  </div>
+
   <script type="module" src="func.js"></script>
   <script src="https://www.youtube.com/iframe_api"></script>
   <script type="module" src="load.js"></script>

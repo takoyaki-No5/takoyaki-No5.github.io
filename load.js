@@ -17,15 +17,16 @@ export const create_list=()=>{
         li.dataset.index=i;
         const div=document.createElement("div");
         const title=document.createElement("span");
-        const view_count=document.createElement("span");
+        const channel_name_and_view_count=document.createElement("span");
         const img=document.createElement("img");
         const index=document.createElement("span");
         
         title.textContent=item.snippet.title;
-        view_count.textContent=`${format_view_count(item.viewCount)}`;
+        channel_name_and_view_count.textContent=`${item.snippet.videoOwnerChannelTitle}・${format_view_count(item.viewCount)}`;
+        channel_name_and_view_count.classList.add("channel-title-and-view-count");
         div.appendChild(title)
-        div.appendChild(view_count)
-        img.src=item.snippet?.thumbnails?.default?.url ?? null;
+        div.appendChild(channel_name_and_view_count)
+        img.src=item.snippet?.thumbnails?.medium?.url ?? null;
         index.textContent=i+1;
         li.appendChild(index);
         li.appendChild(img);
@@ -39,16 +40,22 @@ export const create_list=()=>{
 }
 
 const load=async()=> {
+    const playlist_url =`https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${PLAYLIST_ID}&key=${API_KEY}`;
+    const playlist_res = await fetch(playlist_url);
+    const playlist_data = await playlist_res.json();
+    document.getElementById("playlistTitle").textContent=playlist_data.items[0].snippet.title;
+
     let next_page_token ="";
     const max_results=50;
     do{
-        const url=`https://www.googleapis.com/youtube/v3/playlistItems?` + `part=snippet&playlistId=${PLAYLIST_ID}&maxResults=${max_results}&key=${API_KEY}`+
+        const url=`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${PLAYLIST_ID}&maxResults=${max_results}&key=${API_KEY}`+
             (next_page_token ? `&pageToken=${next_page_token}`:"");
         const res = await fetch(url);
         const data = await res.json();
         all_items.push(...data.items);
         next_page_token = data.nextPageToken;
     }while(next_page_token);
+    //}while(false);
     
     let all_video_ids=all_items.map(item=>item.snippet.resourceId.videoId)
     
@@ -61,6 +68,7 @@ const load=async()=> {
         const data =await res.json();
         video_datas.push(...data.items);
     }
+    console.log(video_datas);
     let j=0;
     for(let i=0;i<all_items.length;i++){
         const item=all_items[i];
@@ -86,13 +94,27 @@ const initPlayer=()=>{
         return;
     }
 
-    const highLightCurrentVideo=(idx)=>{
-        const lis = document.querySelectorAll("#videoList li");
+    const highLightCurrentVideo = (idx) => {
+        const videoList = document.getElementById("videoList");
+        const scrollContainer = videoList.parentElement;
+        const lis = videoList.querySelectorAll("li");
+
         lis.forEach((li, i) => {
-            li.classList.toggle("current", i === idx);
+            const videoIndex = li.querySelector("span"); 
+            const isCurrent = i === idx;
+            li.classList.toggle("current", isCurrent);
+            videoIndex.textContent = isCurrent ? "▶" : (i + 1);
         });
-    }
-    
+
+        const currentLi = videoList.querySelector("li.current");
+        if (currentLi) {
+            scrollContainer.scrollTo({
+                top: currentLi.offsetTop - scrollContainer.offsetTop-63,
+                behavior: 'smooth'
+            });
+        }
+    };
+
     function onPlayerError(event){
         console.warn("動画再生エラー:", event.data, "idx:", idx);
         // エラーが出たら次の動画へ
@@ -106,9 +128,18 @@ const initPlayer=()=>{
         }
     }
     
+    const video_info=document.getElementById("video-info");
     function onPlayerStateChange(event){
         if(event.data===YT.PlayerState.PLAYING){
             highLightCurrentVideo(idx);
+            video_info.innerHTML="";
+            const title=document.createElement("span");
+            const channel_name_and_view_count=document.createElement("span");
+            channel_name_and_view_count.classList.add("channel-title-and-view-count");
+            title.textContent=display_items[idx].snippet.title;
+            channel_name_and_view_count.textContent=`${display_items[idx].snippet.videoOwnerChannelTitle}・${format_view_count(display_items[idx].viewCount)}`;
+            video_info.appendChild(title);
+            video_info.appendChild(channel_name_and_view_count);
             is_playing=true;
         }
         if(event.data===YT.PlayerState.PAUSED){

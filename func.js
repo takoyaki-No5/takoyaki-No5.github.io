@@ -2,11 +2,11 @@ export const format_view_count=(num)=> {
   if(!num) return '';
   if (num >= 100000000) { 
     const value = (num / 100000000).toFixed(1);
-    return value.replace(/\.0$/, '') + '億回視聴';
+    return value.replace(/\.0$/, '') + '億 回視聴';
   } else if (num >= 10000) {
-    return Math.floor(num / 10000) + '万回視聴';
+    return Math.floor(num / 10000) + '万 回視聴';
   } else {
-    return num + '回視聴';
+    return num + ' 回視聴';
   }
 }
 

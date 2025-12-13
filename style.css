@@ -1,40 +1,48 @@
 #videoList li{
     display: flex;
-    padding: 1px 0;
-    align-items: center;
+    border-radius: 12px;
+}
+
+#videoList li:hover{
+    background-color: #f0f0f0;
 }
 
 #videoList li>span{
     padding-right: 10px;
+    padding-left: 2px;
     width: 30px;
     text-align: right;
+    align-self: center;
 }
 #videoList li div{
     display: flex;
     flex-direction: column;
-    padding-left: 10px;
+    align-items: start;
+    padding: 2px 0 0 10px;
+    width: 80%;
+    font-size: 15px;
+    font-weight: bold;
 }
 
-#videoList li div span{
-    margin:3px;
+.channel-title-and-view-count{
+    color: gray;
+    font-size: 12px;
+    margin-top: 6px;
 }
 
 #videoList li.current{
-    background-color: antiquewhite;
+    background-color: #e0e8f5;
 }
+
 #videoList img{
     object-fit: cover;
     object-position: center;
-    height: 66px;
-    width: 119px;
-}
-
-#playlistForm{
-    height: 80px;
+    width: 23%;
+    border-radius: 6px;
 }
 
 body{
-    max-width: 1200px;
+    max-width: 800px;
 }
 
 #player{
@@ -50,6 +58,24 @@ body{
     border: 8px solid rgba(0, 255, 255, 0.2); 
     border-top-color: rgba(0, 255, 255, 1);
     animation: rotate 1s linear infinite;
+}
+
+button{
+    border: solid 1px black;
+}
+
+.form-control {
+    border-color: #999;
+}
+
+#playlistTitle {
+    margin-right: 640px;
+}
+
+#player {
+    width: 640px;
+    height: 360px;
+    border-radius: 6px;
 }
 
 @keyframes rotate {

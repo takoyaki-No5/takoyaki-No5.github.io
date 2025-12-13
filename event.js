@@ -5,6 +5,9 @@ import { compare_position_at,compare_view_count,sort,dp } from "./algorithm.js";
 const handle_sort=(event)=>{
     const value=event.target.value;
     switch (value) {
+    case "default":
+        display_items.splice(0,display_items.length,...all_items);
+        break;
     case "positionDesc":
         sort(display_items, compare_position_at);
         break;
@@ -30,7 +33,7 @@ const handle_search=(event)=>{
     const data = new FormData(search_form);
 
     const minViews=Number(data.get("minViews"))*10000;
-    const maxViews=Number(data.get("maxViews"))*10000;
+    const maxViews=data.get("maxViews")=='' ? 100000000000:Number(data.get("maxViews"))*10000;
 
     const from_date = data.get("fromDate"); 
     const to_date   = data.get("toDate");
@@ -41,7 +44,7 @@ const handle_search=(event)=>{
         const from_bool = from_date ? new Date(item.snippet.publishedAt) >= new Date(from_date) : true;
         const to_bool = to_date ? new Date(item.snippet.publishedAt) <= new Date(to_date) : true;
         return view_bool && from_bool && to_bool;
-    })
+    });
 
     display_items.splice(0,display_items.length,...filterd_items);
     create_list();
