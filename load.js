@@ -32,10 +32,15 @@ export const create_list=()=>{
         li.appendChild(img);
         li.appendChild(div);
         video_list.appendChild(li);
+
+        li.addEventListener("click", () => {
+            idx = parseInt(li.dataset.index);
+            loadVideo(); 
+        });
     });
     idx = 0;
     if(player && display_items.length > 0){
-        player.cueVideoById(display_items[idx].snippet.resourceId.videoId);
+        loadVideo(true);
     }
 }
 
@@ -88,32 +93,63 @@ const load=async()=> {
     console.log(display_items)
 }
 
+const highLightCurrentVideo = () => {
+    const videoList = document.getElementById("videoList");
+    const lis = videoList.querySelectorAll("li");
+    lis.forEach((li, i) => {
+        const videoIndex = li.querySelector("span"); 
+        const isCurrent = i === idx;
+        li.classList.toggle("current", isCurrent);
+        videoIndex.textContent = isCurrent ? "▶" : (i + 1);
+    });
+
+    const currentLi = videoList.querySelector("li.current");
+    const liRect = currentLi.getBoundingClientRect();
+    const ulRect = videoList.getBoundingClientRect();
+    if (currentLi) {
+        videoList.scrollTo({
+            top: videoList.scrollTop + (liRect.top - ulRect.top),
+            behavior: 'smooth'
+        });
+    }
+};
+
+const video_info=document.getElementById("video-info");
+function updateVideoInfo() {
+    video_info.innerHTML = "";
+
+    const title = document.createElement("span");
+    const channel_name_and_view_count = document.createElement("span");
+    channel_name_and_view_count.classList.add("channel-title-and-view-count");
+
+    title.textContent = display_items[idx].snippet.title;
+    channel_name_and_view_count.textContent = `${display_items[idx].snippet.videoOwnerChannelTitle}・${format_view_count(display_items[idx].viewCount)}`;
+
+    video_info.appendChild(title);
+    video_info.appendChild(channel_name_and_view_count);
+}
+
+function loadVideo(cue=false) {
+    if(cue){
+        const videoList = document.getElementById("videoList");
+        const currentLi = videoList.querySelector("li.current");
+        if(currentLi){
+            currentLi.classList.toggle("current");
+            currentLi.querySelector("span").textContent = idx;
+        }
+        player.cueVideoById(display_items[idx].snippet.resourceId.videoId);
+    }else{
+        player.loadVideoById(display_items[idx].snippet.resourceId.videoId);
+        highLightCurrentVideo();
+    }
+    updateVideoInfo(); 
+}
+
 const initPlayer=()=>{
     if(!display_items || display_items.length===0){
         console.error("動画データが揃っていません");
         return;
     }
-
-    const highLightCurrentVideo = (idx) => {
-        const videoList = document.getElementById("videoList");
-        const scrollContainer = videoList.parentElement;
-        const lis = videoList.querySelectorAll("li");
-
-        lis.forEach((li, i) => {
-            const videoIndex = li.querySelector("span"); 
-            const isCurrent = i === idx;
-            li.classList.toggle("current", isCurrent);
-            videoIndex.textContent = isCurrent ? "▶" : (i + 1);
-        });
-
-        const currentLi = videoList.querySelector("li.current");
-        if (currentLi) {
-            scrollContainer.scrollTo({
-                top: currentLi.offsetTop - scrollContainer.offsetTop-63,
-                behavior: 'smooth'
-            });
-        }
-    };
 
     function onPlayerError(event){
         console.warn("動画再生エラー:", event.data, "idx:", idx);
@@ -121,34 +157,28 @@ const initPlayer=()=>{
         idx++;
         if(idx < display_items.length){
             if(is_playing){
-                player.loadVideoById(display_items[idx].snippet.resourceId.videoId);
+                loadVideo();
             }else{
-                player.cueVideoById(display_items[idx].snippet.resourceId.videoId);
+                console.log(is_playing);
+                loadVideo(true);
             }
         }
     }
     
-    const video_info=document.getElementById("video-info");
     function onPlayerStateChange(event){
         if(event.data===YT.PlayerState.PLAYING){
-            highLightCurrentVideo(idx);
-            video_info.innerHTML="";
-            const title=document.createElement("span");
-            const channel_name_and_view_count=document.createElement("span");
-            channel_name_and_view_count.classList.add("channel-title-and-view-count");
-            title.textContent=display_items[idx].snippet.title;
-            channel_name_and_view_count.textContent=`${display_items[idx].snippet.videoOwnerChannelTitle}・${format_view_count(display_items[idx].viewCount)}`;
-            video_info.appendChild(title);
-            video_info.appendChild(channel_name_and_view_count);
+            highLightCurrentVideo();
             is_playing=true;
+            console.log("true")
         }
         if(event.data===YT.PlayerState.PAUSED){
             is_playing=false;
+            console.log("true")
         }
         if(event.data===YT.PlayerState.ENDED){
             idx++;
             if(idx<display_items.length){
-                player.loadVideoById(display_items[idx].snippet.resourceId.videoId);
+                loadVideo();
             }else{
                 console.log("全部再生しました");
             }
@@ -185,6 +215,7 @@ const initApp = async () => {
     await waitForYouTubeAPI();   
     initPlayer();                
     loader.hidden=true;
+    updateVideoInfo(); 
 }
 
 initApp();
