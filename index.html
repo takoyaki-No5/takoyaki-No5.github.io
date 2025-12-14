@@ -12,10 +12,10 @@
   <h1 class="fs-2 mt-3">YouTube プレイリスト再生</h1>
   
   <h2 class="fs-4">絞り込み</h2>
-  <form id="searchForm" class="d-flex align-items-center">
-    <input id="minViews" class="form-control w-auto" type="number" name="minViews" min="0" placeholder="再生回数"/>
+  <form id="searchForm" class="d-flex align-items-center justify-content-center">
+    <input id="minViews" class="form-control w-25" type="number" name="minViews" min="0" placeholder="再生回数"/>
     <span class="fs-4 mx-1">~</span>
-    <input id="maxViews" class="form-control w-auto" type="number" name="maxViews" min="0"/>
+    <input id="maxViews" class="form-control w-25" type="number" name="maxViews" min="0"/>
     <span class="fs-5 ms-1 me-2">万回</span>
     <button class="btn btn-outline-primary fw-bold" type="submit">絞り込み</button>
   </form>
@@ -23,7 +23,7 @@
   <h2 class="fs-4">n分のプレイリスト作成</h2>
   <form id="playlistForm">
     <div class="d-flex align-items-center">
-      <input id="playlistTime" class="form-control w-auto" type="number" name="playlistTime" min="0" placeholder="プレイリストの長さ"/>
+      <input id="playlistTime" class="form-control w-50" type="number" name="playlistTime" min="0" placeholder="プレイリストの長さ"/>
       <span class="fs-5 ms-1 me-2">分</span>
       <button class="btn btn-outline-primary fw-bold" type="submit">作成する</button>
     </div>
@@ -36,8 +36,8 @@
       <option value="viewCountAsc">再生回数(少ない順)</option>
       <option value="viewCountDesc">再生回数(多い順)</option>
     </select>
-    <button class="btn btn-outline-primary fw-bold" id="shuffle">シャッフル</button>
-    <button class="btn btn-outline-dark fw-bold" id="reset" type="button">全てクリア</button>
+    <button class="btn btn-outline-primary fw-bold w-auto" id="shuffle">シャッフル</button>
+    <button class="btn btn-outline-dark fw-bold w-auto" id="reset" type="button">全てクリア</button>
   </div>
   
   <div class="d-flex flex-column align-items-center">

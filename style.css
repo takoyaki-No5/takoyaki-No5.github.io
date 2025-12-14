@@ -50,9 +50,8 @@
 }
 
 body{
-    max-width: 800px;
+    max-width:100vw;
 }
-
 
 #load-circle {
     width: 6.25rem;
