@@ -65,7 +65,6 @@ export const load=async(playlist_id)=> {
     }else{
         id_error.hidden=true;
     }
-    YT_player.hidden=true;
     loader.hidden=false;
     await new Promise(requestAnimationFrame);
     document.getElementById("playlistId").value=playlist_id;
@@ -89,8 +88,8 @@ export const load=async(playlist_id)=> {
         const data = await res.json();
         all_items.push(...data.items);
         next_page_token = data.nextPageToken;
-    //}while(next_page_token);
-    }while(false);
+    }while(next_page_token);
+    //}while(false);
     let all_video_ids=all_items.map(item=>item.snippet.resourceId.videoId)
     
     const chunk_size=50;
@@ -119,7 +118,6 @@ export const load=async(playlist_id)=> {
     display_items=[...all_items];
     create_list();
     console.log(display_items)
-    YT_player.hidden=false;
     loader.hidden=true;
 }
 

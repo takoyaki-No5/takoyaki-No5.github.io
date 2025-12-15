@@ -53,15 +53,6 @@ body{
     max-width:800px;
 }
 
-#load-circle {
-    width: 6.25rem;
-    height: 6.25rem;
-    border-radius: 50%;
-    border: 0.5rem solid rgba(0, 255, 255, 0.2); 
-    border-top-color: rgba(0, 255, 255, 1);
-    animation: rotate 1s linear infinite;
-}
-
 button{
     border: solid 1px black;
 }
@@ -85,6 +76,22 @@ button{
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%); 
+    z-index: 10;
+    background-color: white;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#load-circle {
+    width: 6.25rem;
+    height: 6.25rem;
+    border-radius: 50%;
+    border: 0.5rem solid rgba(0, 255, 255, 0.2); 
+    border-top-color: rgba(0, 255, 255, 1);
+    animation: rotate 1s linear infinite;
 }
 
 .error{
