@@ -47,7 +47,6 @@ export const create_list=()=>{
     }
 }
 
-const YT_player=document.getElementById("player");
 const loader=document.getElementById("loader");
 export const load=async(playlist_id)=> {
     const id_error=document.getElementById("idError");
