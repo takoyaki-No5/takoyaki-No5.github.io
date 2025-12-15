@@ -1,3 +1,10 @@
+export const request_by_playlist_id=async(playlist_id,api_key)=>{
+  const playlist_url =`https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${playlist_id}&key=${api_key}`;
+  const playlist_res = await fetch(playlist_url);
+  const playlist_data = await playlist_res.json();
+  return playlist_data;
+}
+
 export const format_view_count=(num)=> {
   if(!num) return '';
   if (num >= 100000000) { 

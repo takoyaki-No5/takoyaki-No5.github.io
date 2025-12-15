@@ -9,22 +9,29 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="text-center d-flex flex-column align-items-center m-auto gap-3 p-3">
-  <h1 class="fs-2 mt-3">YouTube プレイリスト再生</h1>
+  <h1 class="fs-2 fw-bold">YouTube プレイリスト再生</h1>
   
+  <h2 class="fs-4">プレイリストID検索</h2>
+  <form id="playlistIdForm" class="d-flex align-items-center justify-content-center gap-2 w-100">
+    <input id="playlistId" class="form-control form-control-lg w-75" name="playlistId" placeholder="プレイリストID"/>
+    <button class="btn btn-lg btn-outline-primary fw-bold" type="submit">検索</button>
+  </form>
+  <div id="idError" class="error" hidden>IDが不正です</div>
+
   <h2 class="fs-4">絞り込み</h2>
   <form id="searchForm" class="d-flex align-items-center justify-content-center">
     <input id="minViews" class="form-control w-25" type="number" name="minViews" min="0" placeholder="再生回数"/>
     <span class="fs-4 mx-1">~</span>
     <input id="maxViews" class="form-control w-25" type="number" name="maxViews" min="0"/>
-    <span class="fs-5 ms-1 me-2">万回</span>
+    <span class="fs-6 ms-1 me-2">万回</span>
     <button class="btn btn-outline-primary fw-bold" type="submit">絞り込み</button>
   </form>
   
   <h2 class="fs-4">n分のプレイリスト作成</h2>
-  <form id="playlistForm">
+  <form id="createPlaylistForm">
     <div class="d-flex align-items-center">
-      <input id="playlistTime" class="form-control w-50" type="number" name="playlistTime" min="0" placeholder="プレイリストの長さ"/>
-      <span class="fs-5 ms-1 me-2">分</span>
+      <input id="createPlaylistTime" class="form-control w-50" type="number" name="createPlaylistTime" min="0" placeholder="プレイリストの長さ"/>
+      <span class="fs-6 ms-1 me-2">分</span>
       <button class="btn btn-outline-primary fw-bold" type="submit">作成する</button>
     </div>
     <div id="playlistTotalTime"></div>
@@ -40,22 +47,20 @@
     <button class="btn btn-outline-dark fw-bold w-auto" id="reset" type="button">全てクリア</button>
   </div>
   
-  <div class="d-flex flex-column align-items-center">
-    <div id="player">
-      <div id="loader" hidden>
-        <div id="load-circle"></div>
-      </div>
+  <div class="d-flex flex-column align-items-center" style="position: relative; width: 40rem; max-width: 100%; aspect-ratio: 16/11; ">
+    <div id="player"></div>
+    <div id="loader" hidden>
+      <div id="load-circle"></div>
     </div>
-    <div id="video-info" class="d-flex flex-column align-self-start align-items-start my-3"></div>
+    <div id="video-info" class="d-flex flex-column align-self-start align-items-start my-3 mx-2"></div>
   </div>
 
-  <div class="border rounded mx-3 d-flex flex-column align-items-start" style="height: 600px; ">
-    <div class="bg-white px-3 py-2 border-bottom">
+  <div class="border rounded-4 d-flex flex-column align-items-start w-100" style="height: 600px; ">
+    <div class="bg-white px-4 py-3 border-bottom">
       <h3 id="playlistTitle" class="fs-1 m-0"></h3>
     </div>
-    <ul id="videoList" class="list-unstyled d-flex flex-column gap-1 ps-2 py-1" style="overflow-y: auto; flex-grow: 1;"></ul>
+    <ul id="videoList" class="list-unstyled d-flex flex-column gap-1 ps-1 py-1" style="overflow-y: auto; flex-grow: 1;"></ul>
   </div>
-
 
   <script type="module" src="func.js"></script>
   <script src="https://www.youtube.com/iframe_api"></script>

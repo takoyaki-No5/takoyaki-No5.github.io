@@ -1,5 +1,5 @@
 import { sec_to_our_min, shuffleArray } from "./func.js";
-import { create_list, all_items,display_items } from "./load.js";
+import { create_list, all_items,display_items, load } from "./load.js";
 import { compare_position_at,compare_view_count,sort,dp } from "./algorithm.js";
 
 const handle_sort=(event)=>{
@@ -25,6 +25,7 @@ const handle_sort=(event)=>{
 }
 
 document.getElementById("sort").addEventListener("change",handle_sort);
+
 
 const search_form=document.getElementById("searchForm");
 
@@ -52,9 +53,10 @@ const handle_search=(event)=>{
 
 search_form.addEventListener("submit",handle_search);
 
+
 const handle_create_playlist=(event) => {
     event.preventDefault(); 
-    const target_minutes = Number(document.getElementById("playlistTime").value);
+    const target_minutes = Number(document.getElementById("createPlaylistTime").value);
     const times_arr=display_items.map(item=>{
         return item.duration;
     })
@@ -66,15 +68,24 @@ const handle_create_playlist=(event) => {
     document.getElementById("playlistTotalTime").innerHTML=`${sec_to_our_min(dp_res.best_sum)} のプレイリストを作成しました! `;
 }
 
-document.getElementById("playlistForm").addEventListener("submit",handle_create_playlist );
+document.getElementById("createPlaylistForm").addEventListener("submit",handle_create_playlist );
+
 
 document.getElementById("reset").addEventListener("click",()=>{
     display_items.splice(0,display_items.length,...all_items);
     create_list();
 });
 
+
 document.getElementById("shuffle").addEventListener("click",()=>{
     const shuffle_arr=shuffleArray(all_items);
     display_items.splice(0,display_items.length,...shuffle_arr);
     create_list();
+});
+
+
+document.getElementById("playlistIdForm").addEventListener("submit",async(event)=>{
+    event.preventDefault();
+    const playlist_id=document.getElementById("playlistId").value;
+    load(playlist_id);
 });

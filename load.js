@@ -1,13 +1,16 @@
-import {format_view_count, parse_duration} from "./func.js";
-export const all_items=[];
+import {format_view_count, parse_duration, request_by_playlist_id} from "./func.js";
+export let all_items=[];
 export let display_items=[];
 
 //const CHANNEL_ID = "UCFz1nNoqzgfM-OhmhuI1fYg";
-const API_KEY = "AIzaSyC32k1f-L-HgWX7vZjHnPGTP-TnKa4eZtY";            
-const PLAYLIST_ID = "PLg_Vllr2X7mKpLGkxsHPQe7NwIyLZ6fF5"
+export const API_KEY = "AIzaSyC32k1f-L-HgWX7vZjHnPGTP-TnKa4eZtY";            
+const DEFAULT_PLAYLIST_ID = "PLg_Vllr2X7mKpLGkxsHPQe7NwIyLZ6fF5" 
 let player;
 let idx=0;
 let is_playing=false //playerがエラーで止まったときなどに使うので自前の変数で管理
+const params = new URLSearchParams(location.search);
+const playlist_id = params.get("Id") || DEFAULT_PLAYLIST_ID;
+
 
 export const create_list=()=>{
     const video_list=document.getElementById("videoList");
@@ -44,24 +47,50 @@ export const create_list=()=>{
     }
 }
 
-const load=async()=> {
-    const playlist_url =`https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${PLAYLIST_ID}&key=${API_KEY}`;
-    const playlist_res = await fetch(playlist_url);
-    const playlist_data = await playlist_res.json();
+const YT_player=document.getElementById("player");
+const loader=document.getElementById("loader");
+export const load=async(playlist_id)=> {
+    const id_error=document.getElementById("idError");
+    let playlist_data=null;
+    try {
+        playlist_data=await request_by_playlist_id(playlist_id,API_KEY);
+    } catch (error) {
+        id_error.hidden=false;
+        return;
+    }
+    
+    if(!playlist_data.items || playlist_data.items.length===0){
+        id_error.hidden=false;
+        return;
+    }else{
+        id_error.hidden=true;
+    }
+    YT_player.hidden=true;
+    loader.hidden=false;
+    await new Promise(requestAnimationFrame);
+    document.getElementById("playlistId").value=playlist_id;
+    const url = new URL(window.location);
+    url.searchParams.set("Id",playlist_id);
+    if(playlist_id===DEFAULT_PLAYLIST_ID){
+        history.replaceState(null, "", url);
+    }else{
+        history.pushState(null,"",url);
+    }
+    
     document.getElementById("playlistTitle").textContent=playlist_data.items[0].snippet.title;
 
     let next_page_token ="";
     const max_results=50;
+    all_items=[];
     do{
-        const url=`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${PLAYLIST_ID}&maxResults=${max_results}&key=${API_KEY}`+
+        const url=`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlist_id}&maxResults=${max_results}&key=${API_KEY}`+
             (next_page_token ? `&pageToken=${next_page_token}`:"");
         const res = await fetch(url);
         const data = await res.json();
         all_items.push(...data.items);
         next_page_token = data.nextPageToken;
-    }while(next_page_token);
-    //}while(false);
-    
+    //}while(next_page_token);
+    }while(false);
     let all_video_ids=all_items.map(item=>item.snippet.resourceId.videoId)
     
     const chunk_size=50;
@@ -73,7 +102,7 @@ const load=async()=> {
         const data =await res.json();
         video_datas.push(...data.items);
     }
-    console.log(video_datas);
+    
     let j=0;
     for(let i=0;i<all_items.length;i++){
         const item=all_items[i];
@@ -86,11 +115,12 @@ const load=async()=> {
             item.viewCount=Number(video_datas[i-j].statistics.viewCount);
             item.duration=parse_duration(video_datas[i-j].contentDetails.duration);
         }
-       
     }
     display_items=[...all_items];
     create_list();
     console.log(display_items)
+    YT_player.hidden=false;
+    loader.hidden=true;
 }
 
 const highLightCurrentVideo = () => {
@@ -108,7 +138,7 @@ const highLightCurrentVideo = () => {
     const ulRect = videoList.getBoundingClientRect();
     if (currentLi) {
         videoList.scrollTo({
-            top: videoList.scrollTop + (liRect.top - ulRect.top),
+            top: videoList.scrollTop + (liRect.top - ulRect.top)-1,
             behavior: 'smooth'
         });
     }
@@ -208,13 +238,10 @@ const waitForYouTubeAPI = () => {
     });
 }
 
-const loader=document.getElementById("loader");
 const initApp = async () => {
-    loader.hidden=false;
-    await load();                
+    await load(playlist_id);                
     await waitForYouTubeAPI();   
     initPlayer();                
-    loader.hidden=true;
     updateVideoInfo(); 
 }
 
