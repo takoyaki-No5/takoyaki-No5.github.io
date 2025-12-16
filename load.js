@@ -8,8 +8,9 @@ const DEFAULT_PLAYLIST_ID = "PLg_Vllr2X7mKpLGkxsHPQe7NwIyLZ6fF5"
 let player;
 let idx=0;
 let ever_played=false; //再生リストを一度でも再生したか(create_list()でリセット)
-const params = new URLSearchParams(location.search);
-const playlist_id = params.get("Id") || DEFAULT_PLAYLIST_ID;
+let params = new URLSearchParams(location.search);
+let playlist_id = params.get("Id") || DEFAULT_PLAYLIST_ID;
+const cur_url = new URL(window.location);
 
 
 export const create_list=()=>{
@@ -74,14 +75,12 @@ export const load=async(playlist_id)=> {
     
     await new Promise(requestAnimationFrame);
     document.getElementById("playlistId").value=playlist_id;
-    const url = new URL(window.location);
-    url.searchParams.set("Id",playlist_id);
-    if(playlist_id===DEFAULT_PLAYLIST_ID){
+    if(playlist_id===DEFAULT_PLAYLIST_ID || cur_url.searchParams.get("Id")===playlist_id){
         console.log("replace")
-        history.replaceState(null, "", url);
     }else{
         console.log("push")
-        history.pushState(null,"",url);
+        cur_url.searchParams.set("Id",playlist_id);
+        history.pushState(null,"",cur_url);
     }
     
     document.getElementById("playlistTitle").textContent=playlist_data.items[0].snippet.title;
@@ -251,3 +250,9 @@ const initApp = async () => {
 }
 
 initApp();
+
+window.addEventListener("popstate", () => {
+    params = new URLSearchParams(location.search);
+    playlist_id = params.get("Id") || DEFAULT_PLAYLIST_ID;
+    load(playlist_id);
+});
