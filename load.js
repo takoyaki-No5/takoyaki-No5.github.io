@@ -163,8 +163,8 @@ function updateVideoInfo() {
     video_info.appendChild(channel_name_and_view_count);
 }
 
-function loadVideo(cue=false) {
-    if(cue){
+function loadVideo(isCue=false) {
+    if(isCue){
         const videoList = document.getElementById("videoList");
         const currentLi = videoList.querySelector("li.current");
         if(currentLi){
