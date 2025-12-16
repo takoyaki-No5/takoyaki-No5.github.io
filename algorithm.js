@@ -37,6 +37,12 @@ export const sort=(array,compare_func,reverse=false)=>{
 
 //最も近い値になる組み合わせを探索
 export const dp=(arr,target)=>{
+    if(arr.length===0){
+        return {
+            best_sum: 0,
+            indexes:[] 
+        };
+    }
     target*=60;
     const t_max=target+Math.max(...arr);
     console.log(arr);

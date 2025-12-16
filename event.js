@@ -39,7 +39,6 @@ const handle_search=(event)=>{
     const from_date = data.get("fromDate"); 
     const to_date   = data.get("toDate");
     const filterd_items=display_items.filter(item=>{
-        console.log(minViews<=item.viewCount && item.viewCount<=maxViews);
         const view_bool=minViews<=item.viewCount && item.viewCount<=maxViews;
 
         const from_bool = from_date ? new Date(item.snippet.publishedAt) >= new Date(from_date) : true;

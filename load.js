@@ -1,4 +1,4 @@
-import {format_view_count, parse_duration, request_by_playlist_id} from "./func.js";
+import {format_view_count, parse_duration } from "./func.js";
 export let all_items=[];
 export let display_items=[];
 
@@ -7,7 +7,7 @@ export const API_KEY = "AIzaSyC32k1f-L-HgWX7vZjHnPGTP-TnKa4eZtY";
 const DEFAULT_PLAYLIST_ID = "PLg_Vllr2X7mKpLGkxsHPQe7NwIyLZ6fF5" 
 let player;
 let idx=0;
-let is_playing=false //playerがエラーで止まったときなどに使うので自前の変数で管理
+let ever_played=false; //再生リストを一度でも再生したか(create_list()でリセット)
 const params = new URLSearchParams(location.search);
 const playlist_id = params.get("Id") || DEFAULT_PLAYLIST_ID;
 
@@ -45,6 +45,10 @@ export const create_list=()=>{
     if(player && display_items.length > 0){
         loadVideo(true);
     }
+    ever_played=false;
+    video_list.scrollTo({
+        top: 0
+    });
 }
 
 const loader=document.getElementById("loader");
@@ -52,7 +56,9 @@ export const load=async(playlist_id)=> {
     const id_error=document.getElementById("idError");
     let playlist_data=null;
     try {
-        playlist_data=await request_by_playlist_id(playlist_id,API_KEY);
+        const playlist_url =`https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${playlist_id}&key=${API_KEY}`;
+        const playlist_res = await fetch(playlist_url);
+        playlist_data = await playlist_res.json();
     } catch (error) {
         id_error.hidden=false;
         return;
@@ -65,13 +71,16 @@ export const load=async(playlist_id)=> {
         id_error.hidden=true;
     }
     loader.hidden=false;
+    
     await new Promise(requestAnimationFrame);
     document.getElementById("playlistId").value=playlist_id;
     const url = new URL(window.location);
     url.searchParams.set("Id",playlist_id);
     if(playlist_id===DEFAULT_PLAYLIST_ID){
+        console.log("replace")
         history.replaceState(null, "", url);
     }else{
+        console.log("push")
         history.pushState(null,"",url);
     }
     
@@ -117,7 +126,6 @@ export const load=async(playlist_id)=> {
     display_items=[...all_items];
     create_list();
     console.log(display_items)
-    loader.hidden=true;
 }
 
 const highLightCurrentVideo = () => {
@@ -183,32 +191,31 @@ const initPlayer=()=>{
         // エラーが出たら次の動画へ
         idx++;
         if(idx < display_items.length){
-            if(is_playing){
+            if(ever_played){
                 loadVideo();
             }else{
-                console.log(is_playing);
                 loadVideo(true);
             }
         }
     }
     
     function onPlayerStateChange(event){
-        if(event.data===YT.PlayerState.PLAYING){
+        switch(event.data){
+        case YT.PlayerState.PLAYING: 
             highLightCurrentVideo();
-            is_playing=true;
-            console.log("true")
-        }
-        if(event.data===YT.PlayerState.PAUSED){
-            is_playing=false;
-            console.log("true")
-        }
-        if(event.data===YT.PlayerState.ENDED){
+            ever_played=true;
+            break;
+        case YT.PlayerState.ENDED:
             idx++;
             if(idx<display_items.length){
                 loadVideo();
             }else{
                 console.log("全部再生しました");
             }
+            break;
+        case YT.PlayerState.CUED:
+            loader.hidden=true;
+            break;
         }
     }
     
@@ -221,6 +228,7 @@ const initPlayer=()=>{
             controls:1,
         },
         events:{
+            'onReady':()=>loader.hidden=true,
             'onStateChange':onPlayerStateChange,
             'onError':onPlayerError
         }
