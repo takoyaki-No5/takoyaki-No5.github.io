@@ -35,7 +35,7 @@ export const sec_to_our_min = (sec) => {
   return text;
 };
 
-export const shuffleArray=(array)=> {
+export const shuffle_array=(array)=> {
   const copy = array.slice(); // 元の配列はコピーして保持
   for (let i = copy.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));

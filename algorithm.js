@@ -34,53 +34,53 @@ export const sort=(array,compare_func,reverse=false)=>{
     return array;
 };
 
-
-//最も近い値になる組み合わせを探索
-export const dp=(arr,target)=>{
-    if(arr.length===0){
+export const dp = (arr, target) => {
+    if (arr.length === 0) {
         return {
             best_sum: 0,
-            indexes:[] 
+            indexes: []
         };
     }
-    target*=60;
-    const t_max=target+Math.max(...arr);
-    console.log(arr);
-    
-    let can = Array(t_max + 1).fill(false);// i の合計が作れるかどうか
-    let prev = Array(t_max + 1).fill(-1); // 合計iを作った最後に使ったtimesのindex
+
+    target *= 60;
+    const t_max = target + Math.max(...arr);
+
+    let can = Array(t_max + 1).fill(false);
+    let prev = Array.from({ length: t_max + 1 }, () => []); // 複数候補を持つ
     can[0] = true;
 
-    //作れる値の全マッピング
+    // DPで作れる値をマッピング
     for (let i = 0; i < arr.length; i++) {
-        const time=arr[i];
+        const time = arr[i];
+        if(time==0) continue; //動画時間がゼロ(消されたビデオなど)はいれない
         //target以下の値全てで試す
-        //time以外の値でj-timeが作れるなら、jも作れる
+        //time以外の値でj-timeが作れるなら,jも作れる
         for (let j = t_max; j >= time; j--) {
-            if (can[j - time] && !can[j]) { 
+            if (can[j - time]) {
                 can[j] = true;
-                prev[j] = i; 
+                prev[j].push(i); // 複数候補を追加
             }
         }
     }
 
+    // bestの探索（targetに最も近い値）
     let best = 0;
     for (let i = t_max; i >= 0; i--) {
-        if (can[i]) {
-            if(Math.abs(target-i)<Math.abs(target-best))
+        if (can[i] && Math.abs(target - i) < Math.abs(target - best)) {
             best = i;
         }
     }
-
-    // 組み合わせ復元
+    
+    // bestな組み合わせの中から一つをランダムに復元
     let res = [];
     let now = best;
     while (now > 0) {
-        const i = prev[now];
-        res.push(i);
-        now -= arr[i];
+        const prev_now_arr = prev[now];
+        const prev_now = prev_now_arr[Math.floor(Math.random()*prev_now_arr.length)];
+        res.push(prev_now);
+        now -= arr[prev_now];
     }
-    console.log(can)
+    
     return {
         best_sum: best,
         indexes: res

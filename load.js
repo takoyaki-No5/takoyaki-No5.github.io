@@ -1,5 +1,6 @@
-import {format_view_count, parse_duration } from "./func.js";
+import {format_view_count, parse_duration, sec_to_our_min } from "./func.js";
 export let all_items=[];
+export let sorted_items=[];
 export let display_items=[];
 
 //const CHANNEL_ID = "UCFz1nNoqzgfM-OhmhuI1fYg";
@@ -12,9 +13,9 @@ let params = new URLSearchParams(location.search);
 let playlist_id = params.get("Id") || DEFAULT_PLAYLIST_ID;
 const cur_url = new URL(window.location);
 
+const video_list=document.getElementById("videoList");
 
 export const create_list=()=>{
-    const video_list=document.getElementById("videoList");
     video_list.innerHTML="";
     display_items.forEach((item,i)=>{
         const li=document.createElement("li");
@@ -26,7 +27,7 @@ export const create_list=()=>{
         const index=document.createElement("span");
         
         title.textContent=item.snippet.title;
-        channel_name_and_view_count.textContent=`${item.snippet.videoOwnerChannelTitle}・${format_view_count(item.viewCount)}`;
+        channel_name_and_view_count.textContent=`${item.snippet.videoOwnerChannelTitle}・${format_view_count(item.viewCount)}・${sec_to_our_min(item.duration)}`;
         channel_name_and_view_count.classList.add("channel-title-and-view-count");
         div.appendChild(title)
         div.appendChild(channel_name_and_view_count)
@@ -52,6 +53,14 @@ export const create_list=()=>{
     });
 }
 
+export const reset=()=>{
+    document.getElementById("playlistTotalTime").innerHTML="";
+    document.getElementById("createPlaylistTime").value="";
+    document.getElementById("minViews").value="";
+    document.getElementById("maxViews").value="";
+    document.getElementById("sort").value="default";
+}
+
 const loader=document.getElementById("loader");
 export const load=async(playlist_id)=> {
     //playlistの概要情報の取得
@@ -74,7 +83,7 @@ export const load=async(playlist_id)=> {
         id_error.hidden=true;
     }
     loader.hidden=false;
-    
+
     //URLとhistoryの処理
     await new Promise(requestAnimationFrame);
     document.getElementById("playlistId").value=playlist_id;
@@ -82,13 +91,16 @@ export const load=async(playlist_id)=> {
         cur_url.searchParams.set("Id",playlist_id);
         history.pushState(null,"",cur_url);
     }
-    
+
+    reset();
+   
     document.getElementById("playlistTitle").textContent=playlist_data.items[0].snippet.title;
     //キャッシュ処理
     const cache = JSON.parse(localStorage.getItem(playlist_id));
     if(cache && cache.etag===playlist_data.etag){
         all_items = cache.all_items;
     }else{
+        video_list.innerHTML="";
         //playlistの動画取得
         let next_page_token ="";
         const max_results=50;
@@ -131,6 +143,7 @@ export const load=async(playlist_id)=> {
         }   
     }
 
+    sorted_items=[...all_items];
     display_items=[...all_items];
     localStorage.setItem(playlist_id, JSON.stringify({etag:playlist_data.etag,all_items:all_items}));
     create_list();
