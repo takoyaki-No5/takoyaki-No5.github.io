@@ -54,12 +54,14 @@ export const create_list=()=>{
 
 const loader=document.getElementById("loader");
 export const load=async(playlist_id)=> {
+    //playlistの概要情報の取得
     const id_error=document.getElementById("idError");
     let playlist_data=null;
     try {
         const playlist_url =`https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${playlist_id}&key=${API_KEY}`;
         const playlist_res = await fetch(playlist_url);
         playlist_data = await playlist_res.json();
+        console.log(playlist_data)
     } catch (error) {
         id_error.hidden=false;
         return;
@@ -73,56 +75,64 @@ export const load=async(playlist_id)=> {
     }
     loader.hidden=false;
     
+    //URLとhistoryの処理
     await new Promise(requestAnimationFrame);
     document.getElementById("playlistId").value=playlist_id;
-    if(playlist_id===DEFAULT_PLAYLIST_ID || cur_url.searchParams.get("Id")===playlist_id){
-        console.log("replace")
-    }else{
-        console.log("push")
+    if(playlist_id!==DEFAULT_PLAYLIST_ID && cur_url.searchParams.get("Id")!==playlist_id){
         cur_url.searchParams.set("Id",playlist_id);
         history.pushState(null,"",cur_url);
     }
     
     document.getElementById("playlistTitle").textContent=playlist_data.items[0].snippet.title;
-
-    let next_page_token ="";
-    const max_results=50;
-    all_items=[];
-    do{
-        const url=`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlist_id}&maxResults=${max_results}&key=${API_KEY}`+
-            (next_page_token ? `&pageToken=${next_page_token}`:"");
-        const res = await fetch(url);
-        const data = await res.json();
-        all_items.push(...data.items);
-        next_page_token = data.nextPageToken;
-    }while(next_page_token);
-    //}while(false);
-    let all_video_ids=all_items.map(item=>item.snippet.resourceId.videoId)
-    
-    const chunk_size=50;
-    let video_datas=[]
-    for(let i=0;i<all_video_ids.length;i+=chunk_size){
-        const chunk=all_video_ids.slice(i,i+chunk_size).join(",");
-        const url=`https://www.googleapis.com/youtube/v3/videos?part=contentDetails,statistics&id=${chunk}&key=${API_KEY}`
-        const res=await fetch(url);
-        const data =await res.json();
-        video_datas.push(...data.items);
-    }
-    
-    let j=0;
-    for(let i=0;i<all_items.length;i++){
-        const item=all_items[i];
-        const title = item.snippet.title;
-        const thumbs = item.snippet.thumbnails;
-        if(!thumbs || ["Deleted video", "Private video", "Unavailable video"].includes(title)){
-            item.duration=0;
-            j++;
-        }else{
-            item.viewCount=Number(video_datas[i-j].statistics.viewCount);
-            item.duration=parse_duration(video_datas[i-j].contentDetails.duration);
+    //キャッシュ処理
+    const cache = JSON.parse(localStorage.getItem(playlist_id));
+    if(cache && cache.etag===playlist_data.etag){
+        all_items = cache.all_items;
+    }else{
+        //playlistの動画取得
+        let next_page_token ="";
+        const max_results=50;
+        const max_loop=200/50;
+        all_items=[];
+        let loop_i=0;
+        do{
+            const url=`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${playlist_id}&maxResults=${max_results}&key=${API_KEY}`+
+                (next_page_token ? `&pageToken=${next_page_token}`:"");
+            const res = await fetch(url);
+            const data = await res.json();
+            all_items.push(...data.items);
+            next_page_token = data.nextPageToken;
+            loop_i++;
+        }while(next_page_token && loop_i<max_loop);
+        let all_video_ids=all_items.map(item=>item.snippet.resourceId.videoId)
+        
+        const chunk_size=50;
+        let video_datas=[]
+        for(let i=0;i<all_video_ids.length;i+=chunk_size){
+            const chunk=all_video_ids.slice(i,i+chunk_size).join(",");
+            const url=`https://www.googleapis.com/youtube/v3/videos?part=contentDetails,statistics&id=${chunk}&key=${API_KEY}`
+            const res=await fetch(url);
+            const data =await res.json();
+            video_datas.push(...data.items);
         }
+        
+        let j=0;
+        for(let i=0;i<all_items.length;i++){
+            const item=all_items[i];
+            const title = item.snippet.title;
+            const thumbs = item.snippet.thumbnails;
+            if(!thumbs || ["Deleted video", "Private video", "Unavailable video"].includes(title)){
+                item.duration=0;
+                j++;
+            }else{
+                item.viewCount=Number(video_datas[i-j].statistics.viewCount);
+                item.duration=parse_duration(video_datas[i-j].contentDetails.duration);
+            }
+        }   
     }
+
     display_items=[...all_items];
+    localStorage.setItem(playlist_id, JSON.stringify({etag:playlist_data.etag,all_items:all_items}));
     create_list();
     console.log(display_items)
 }

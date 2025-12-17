@@ -72,6 +72,7 @@ document.getElementById("createPlaylistForm").addEventListener("submit",handle_c
 
 document.getElementById("reset").addEventListener("click",()=>{
     display_items.splice(0,display_items.length,...all_items);
+    document.getElementById("playlistTotalTime").innerHTML="";
     create_list();
 });
 

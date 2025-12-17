@@ -21,10 +21,8 @@
 }
 
 #videoList li div span{
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2; 
-    line-clamp:2;
+    line-height: 1.2rem;
+    max-height: 2.4rem;
     overflow: hidden;
 }
 
