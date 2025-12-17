@@ -92,7 +92,7 @@ export const load=async(playlist_id)=> {
         //playlistの動画取得
         let next_page_token ="";
         const max_results=50;
-        const max_loop=200/50;
+        const max_loop=500/max_results;
         all_items=[];
         let loop_i=0;
         do{
