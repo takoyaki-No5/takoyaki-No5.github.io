@@ -86,14 +86,12 @@ document.getElementById("reset").addEventListener("click",()=>{
     create_list();
 });
 
-
 document.getElementById("shuffle").addEventListener("click",()=>{
     const shuffle_arr=shuffle_array(all_items);
     sorted_items.splice(0,sorted_items.length,...shuffle_arr);
     display_items.splice(0,display_items.length,...shuffle_arr);
     create_list();
 });
-
 
 document.getElementById("playlistIdForm").addEventListener("submit",async(event)=>{
     event.preventDefault();
