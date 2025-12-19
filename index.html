@@ -7,11 +7,16 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/modern-css-reset/dist/reset.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <style>
+    html{
+      font-size:25px;
+    }
+  </style>
 </head>
 <body class="text-center d-flex flex-column align-items-center m-auto px-3">
   <h1 class="fs-5 fw-bold px-3 py-2 bg-danger text-start text-white" style="width: 100vw;">YouTube プレイリスト</h1>
   
-  <h2 class="fs-5 fw-bold">プレイリストID検索</h2>
+  <h2 class="fs-6 fw-bold">プレイリストID検索</h2>
   <details class="accordion w-75">
     <summary>Id取得法</summary>
     <div class="content fs-6 d-flex flex-column align-items-center" >
@@ -26,7 +31,7 @@
   </form>
   <div id="idError" class="error" hidden>IDが不正です</div>
 
-  <h2 class="fs-5 fw-bold">絞り込み</h2>
+  <h2 class="fs-6 fw-bold">絞り込み</h2>
   <form id="searchForm" class="d-flex align-items-center justify-content-center">
     <input id="minViews" class="form-control w-25" type="number" name="minViews" min="0" placeholder="再生回数"/>
     <span class="fs-4 mx-1">~</span>
@@ -35,7 +40,7 @@
     <button class="btn btn-outline-primary fw-bold" type="submit">絞り込み</button>
   </form>
   
-  <h2 class="fs-5 fw-bold">n分のプレイリスト作成</h2>
+  <h2 class="fs-6 fw-bold">n分のプレイリスト作成</h2>
   <form id="createPlaylistForm">
     <div class="d-flex align-items-center">
       <input id="createPlaylistTime" class="form-control w-50" type="number" name="createPlaylistTime" min="0" placeholder="プレイリストの長さ"/>
